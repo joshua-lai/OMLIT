@@ -1,0 +1,29 @@
+import sensor, image, time
+
+sensor.reset()                      # Reset and initialize the sensor.
+sensor.set_pixformat(sensor.RGB565) # Set pixel format to RGB565 (or GRAYSCALE)
+sensor.set_framesize(sensor.QVGA)   # Set frame size to QVGA (320x240)
+sensor.skip_frames(time = 2000)     # Wait for settings take effect.
+clock = time.clock()                # Create a clock object to track the FPS.
+
+while(True):
+    clock.tick()                    # Update the FPS clock.
+    img = sensor.snapshot()         # Take a picture and return the image.
+    print(clock.fps())              # Note: OpenMV Cam runs about half as fast when connected
+                                    # to the IDE. The FPS should increase once disconnected.
+
+    ## GENERATES A LIST OF BLOBS  
+    #(blobs are connected pixel regions that pass a threshold test
+    
+    # dark bits
+    blobList = img.find_blobs([(0,60),(0,60),(0,60)], area_threshold = 5)  
+    # bright bits
+    #blobList = img.find_blobs([(150,250),(150,250),(150,250)], area_threshold = 5)
+    
+
+    ## DRAWING A SHAPE ONTO THE SCREEN MATCHING EACH BLOB ##
+    for num,foundBlob in enumerate(blobList):
+        print(num,type(foundBlob), foundBlob.rect())
+        #img.draw_rectangle(foundBlob.rect())
+        #img.draw_ellipse(foundBlob.enclosed_ellipse())
+        img.draw_edges(foundBlob.min_corners())
