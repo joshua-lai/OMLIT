@@ -1,0 +1,22 @@
+# Modified Hello World Example
+#
+# This has been modified to send a snapshot of whatever the camera is looking at to the raspberry pi every t seconds
+
+import sensor, image, time, pyb
+#####################################################################################################################
+#Here is likely where we would connect it to the Raspberry Pi once that is possible, probably over aurt. May look a little like:
+uart = pyb.UART(3, 115200, timeout_char = 1000)
+#####################################################################################################################
+sensor.reset()                      # Reset and initialize the sensor.
+sensor.set_pixformat(sensor.GRAYSCALE) # I set it to GRAYSCALE instead of RGB
+sensor.set_framesize(sensor.QVGA)   # Set frame size to QVGA (320x240)
+sensor.skip_frames(time = 2000)     # Wait for settings take effect.
+clock = time.clock()                # Create a clock object to track the FPS.
+#define length of time
+t=20   #20 IS JUST AN IDEA, OKAY?
+#This loop takes a pic, sends it to the Pi, and then goes to sleep for t seconds
+while(True):
+    clock.tick()                    # Update the FPS clock.
+    img = sensor.snapshot()         # Take a picture and return the image.
+    print(img)                      #This should send the snapshot to the Raspberry pi it is connected to.
+    time.sleep(t)                   #this puts the camera to sleep for t seconds
