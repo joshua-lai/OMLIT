@@ -1,0 +1,27 @@
+
+# Snapshot Example
+#
+# Note: You will need an SD card to run this example.
+#
+# You can use your OpenMV Cam to save image files.
+
+import sensor, image, pyb, time
+
+RED_LED_PIN = 1
+BLUE_LED_PIN = 3
+
+sensor.reset() # Initialize the camera sensor.
+sensor.set_pixformat(sensor.RGB565) # or sensor.GRAYSCALE
+sensor.set_framesize(sensor.QQVGA) # or sensor.QQVGA (or others)
+sensor.skip_frames(time = 2000) # Let new settings take affect.
+
+clock = time.clock()                # Create a clock object to track the FPS.
+#define length of time
+t=2000   #20 IS JUST AN IDEA, OKAY?
+#This loop takes a pic, sends it to the Pi, and then goes to sleep for t seconds
+while(True):
+    clock.tick()                    # Update the FPS clock.
+    #img = sensor.snapshot()         # Take a picture and return the image.
+    #print(img)                      #This should send the snapshot to the Raspberry pi it is connected to.
+    sensor.snapshot().save("snapshot-%d.jpg" % pyb.rng())
+    time.sleep(t)                   #this puts the camera to sleep for t seconds
