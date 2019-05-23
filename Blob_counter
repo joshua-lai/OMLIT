@@ -1,0 +1,46 @@
+
+# Snapshot Example
+#
+# Note: You will need an SD card to run this example.
+#
+# You can use your OpenMV Cam to save image files.
+
+import sensor, image, pyb, time
+
+RED_LED_PIN = 1
+BLUE_LED_PIN = 3
+
+sensor.reset() # Initialize the camera sensor.
+sensor.set_pixformat(sensor.RGB565) # or sensor.GRAYSCALE
+sensor.set_framesize(sensor.QQVGA) # or sensor.QQVGA (or others)
+sensor.skip_frames(time = 2000) # Let new settings take affect.
+
+clock = time.clock()                # Create a clock object to track the FPS.
+#define length of time
+t=2000   #20 IS JUST AN IDEA, OKAY?
+#This loop takes a pic, counts the blobs, sends this data to the Pi, and then goes to sleep for t seconds
+while(True):
+    clock.tick()                    # Update the FPS clock.
+    img = sensor.snapshot()         # Take a picture and return the image.
+    
+    minSize = 50
+    maxSize = 1000
+    ## GENERATES A LIST OF BLOBS  
+    #(blobs are connected pixel regions that pass a threshold test
+    
+    # dark bits
+    #blobList = img.find_blobs([(0,60),(0,60),(0,60)], area_threshold = minSIze)  
+    # bright bits
+    blobList = img.find_blobs([(10,80),(10,80),(10,80)], area_threshold = minSize)
+    blobList = filter(lambda x: x.area() < maxSize, blobList)
+    print(len("total blobs =",blobList))
+
+    ## DRAWING A SHAPE ONTO THE SCREEN MATCHING EACH BLOB ##
+    for num,foundBlob in enumerate(blobList):
+        print(num,type(foundBlob), foundBlob.rect(), foundBlob.area())
+        #img.draw_rectangle(foundBlob.rect())
+        #img.draw_ellipse(foundBlob.enclosed_ellipse())
+        img.draw_edges(foundBlob.min_corners())
+    print(img)                      #This should send the snapshot to the Raspberry pi it is connected to.
+    sensor.snapshot().save("snapshot-%d.jpg" % pyb.rng())
+    time.sleep(t)                   #this puts the camera to sleep for t seconds
